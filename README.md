@@ -133,7 +133,7 @@ just clean                     # rm -rf pdf/
 
   languages: (
     // level: full CEFR text preferred — "Native", "Professional Working (C1)", etc.
-    (language: "...", level: "..."),
+    (name: "...", level: "..."),
   ),
 
   projects: (

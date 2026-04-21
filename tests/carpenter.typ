@@ -104,10 +104,10 @@
     (name: "Karta Polaka", issuer: "Rzeczpospolita Polska", date: "11.2010"),
   ),
   languages: (
-    (language: "Ukrainian", level: "Native"),
-    (language: "Polish", level: "Fluent (C1)"),
-    (language: "Russian", level: "Professional Working (C1)"),
-    (language: "English", level: "Elementary (A2)"),
+    (name: "Ukrainian", level: "Native"),
+    (name: "Polish", level: "Fluent (C1)"),
+    (name: "Russian", level: "Professional Working (C1)"),
+    (name: "English", level: "Elementary (A2)"),
   ),
   projects: (
     (

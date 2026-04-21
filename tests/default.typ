@@ -52,9 +52,9 @@
     (name: "AWS Solutions Architect – Associate", issuer: "Amazon Web Services", date: "11.2023"),
   ),
   languages: (
-    (language: "Ukrainian", level: "Native"),
-    (language: "English", level: "Professional Working (C1)"),
-    (language: "German", level: "Elementary (A2)"),
+    (name: "Ukrainian", level: "Native"),
+    (name: "English", level: "Professional Working (C1)"),
+    (name: "German", level: "Elementary (A2)"),
   ),
   projects: (
     (
