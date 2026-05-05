@@ -48,6 +48,17 @@
   ),
 )
 
+/// Default section headings
+#let default-headings = (
+  summary: "Summary",
+  experience: "Experience",
+  education: "Education",
+  skills: "Skills",
+  certifications: "Certifications",
+  projects: "Projects",
+  languages: "Languages",
+)
+
 // Diff view markers, no-ops when not in a diff preview.
 #let diff-added(it) = text(fill: rgb("#15803d"), underline(it))
 #let diff-deleted(it) = text(fill: rgb("#b91c1c"), strike(it))
@@ -220,6 +231,8 @@
   )
 
   let theme = themes.at(style-name, default: themes.professional)
+  let headings = data.at("headings", default: (:))
+  let headings = default-headings + if type(headings) == dictionary { headings } else { (:) }
 
   set page(
     paper: "a4",
@@ -260,13 +273,13 @@
   contact-block(data.contact, theme)
 
   if data.at("summary", default: none) != none {
-    section-heading("Summary", theme)
+    section-heading(headings.summary, theme)
     data.summary
   }
 
   let experience = data.at("experience", default: ())
   if experience.len() > 0 {
-    section-heading("Experience", theme)
+    section-heading(headings.experience, theme)
     for exp in experience {
       work-entry(exp, theme)
     }
@@ -274,7 +287,7 @@
 
   let education = data.at("education", default: ())
   if education.len() > 0 {
-    section-heading("Education", theme)
+    section-heading(headings.education, theme)
     for edu in education {
       education-entry(edu, theme)
     }
@@ -282,13 +295,13 @@
 
   let skills = data.at("skills", default: ())
   if skills.len() > 0 {
-    section-heading("Skills", theme)
+    section-heading(headings.skills, theme)
     skills-section(skills)
   }
 
   let certifications = data.at("certifications", default: ())
   if certifications.len() > 0 {
-    section-heading("Certifications", theme)
+    section-heading(headings.certifications, theme)
     for cert in certifications {
       certification-entry(cert, theme)
     }
@@ -296,7 +309,7 @@
 
   let projects = data.at("projects", default: ())
   if projects.len() > 0 {
-    section-heading("Projects", theme)
+    section-heading(headings.projects, theme)
     for project in projects {
       project-entry(project, theme)
     }
@@ -304,7 +317,7 @@
 
   let languages = data.at("languages", default: ())
   if languages.len() > 0 {
-    section-heading("Languages", theme)
+    section-heading(headings.languages, theme)
     languages-line(languages, theme)
   }
 }

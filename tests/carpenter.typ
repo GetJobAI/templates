@@ -2,6 +2,15 @@
 
 #resume((
   style: "professional",
+  headings: (
+    summary: "Profil zawodowy",
+    experience: "Doświadczenie zawodowe",
+    education: "Wykształcenie",
+    skills: "Umiejętności",
+    certifications: "Certyfikaty",
+    projects: "Projekty",
+    languages: "Języki",
+  ),
   contact: (
     name: "Mykhailo Savchenko",
     email: "m.savchenko@stolarz.pl",

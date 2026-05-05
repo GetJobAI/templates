@@ -67,7 +67,8 @@ just clean                     # rm -rf pdf/
 - `hide: true` on any experience or education entry suppresses it without removing it from the data (useful for per-application tailoring in the diff view)
 - Bullet points are Typst content blocks `[like this]`, so inline `*bold*` works naturally for tech keyword highlighting
 
-**German market:**
+**Localisation:**
+- Section headings are overridable per-resume via `data.headings` — pass any subset; unset keys fall back to English defaults
 - Sample data uses `MM.YYYY` date format
 - Language levels render as full CEFR text ("Elementary (A2)") rather than bare codes — A1/B1/C1 are also German driving licence categories, bare codes are ambiguous
 
@@ -78,9 +79,8 @@ just clean                     # rm -rf pdf/
 
 - **Colour toggle** — no flag to strip accent colours for a plain-black ATS submission; all three styles render in colour
 - **Photo field** — not planned for MVP; the Export Service has no image pipeline
-- **German-language headings** — section names are English; a Lebenslauf variant would need Berufserfahrung / Ausbildung / Kenntnisse etc.
 - **Single-page enforcement** — no hard clip at page 1; content overflows naturally (correct for German CVs, which expect 2–3 pages)
-- **Formal ATS testing** — `pdftotext -layout` passes cleanly; not yet run through Jobscan or Affinda with a real job posting
+- **Formal ATS testing** — `pdftotext -layout` passes cleanly; ATS tests pass with at least 80/100 with the other 20 points being subtracted for contents.
 
 **Known quirk:** In the professional style, `pdftotext` without `-layout` may split "Jane Doe" across two lines due to the large bold font's word spacing. With `-layout` (and in real ATS parsers that read the PDF content stream directly) it's a single text run and parses correctly.
 
@@ -89,6 +89,15 @@ just clean                     # rm -rf pdf/
 ```typst
 #let data = (
   style: "minimal",   // optional — "professional" | "minimal" | "technical"
+  headings: (         // optional — override any subset of section headings
+    summary: "...",
+    experience: "...",
+    education: "...",
+    skills: "...",
+    certifications: "...",
+    projects: "...",
+    languages: "...",
+  ),
   contact: (
     name: "...",      // required
     email: "...",     // optional
@@ -144,11 +153,10 @@ just clean                     # rm -rf pdf/
 
 ## Planned
 
-- **Colour toggle:** add a `monochrome` sys input; wrap accent colors in a helper `if monochrome { black } else { theme.accent }`. Useful for ATS submissions where colour can confuse older parsers.
+- **Colour toggle:** add a `monochrome` variant; wrap accent colors in a helper `if monochrome { black } else { theme.accent }`. Useful for ATS submissions where colour can confuse older parsers.
 - **Affinda smoke test in CI:** Affinda has a free tier (50 req/month) with a REST API — piping `resume.pdf` through it produces structured JSON that can catch extraction regressions automatically.
 - **German headings:** a `--input lang=de` input could swap section titles; should map them in a dict `("Experience": "Berufserfahrung", …)` keyed by the lang input.
 - **Photo field:** render an optional `contact.photo` path as a right-floated image at the top of the contact block. Verify the text stream order is unaffected before shipping.
-- **`pdftotext` as a CI smoke test:** already works locally (`just check`); worth running in a GitHub Actions step to catch layout regressions across commits.
 
 ## ATS Extraction Check
 
