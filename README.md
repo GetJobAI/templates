@@ -4,6 +4,8 @@ Typst resume template with three visual styles. ATS compatibility first, aesthet
 
 Requires **typst 0.13+** (developed on 0.14.2).
 
+This repository is the development home of the template: the test files and Justfile here exist to iterate on `template.typ` in isolation and to produce the figures used in the project paper. `template.typ` is the single deliverable — it is copied verbatim into the **`pdf-generator`** service repo, which compiles it in-memory from JSON resume data and serves the resulting PDF over HTTP. Nothing else in this directory ships; only `template.typ` crosses the boundary.
+
 ## Files
 
 | File | Purpose |
@@ -11,10 +13,10 @@ Requires **typst 0.13+** (developed on 0.14.2).
 | `template.typ` | Main deliverable — exports `resume(data)` |
 | `tests/*.typ` | Self-contained test files; each imports `template.typ` and calls `resume(data)` |
 
-`template.typ` is a library: it exports a single `resume(data)` function. Test files in `tests/` are the entry points for local dev. In production the Export Service (and typst.ts) calls `resume(data)` directly with data from `resumes.parsed_data` JSONB.
+`template.typ` is a library: it exports a single `resume(data)` function. Test files in `tests/` are the entry points for local dev. In production the `pdf-generator` service builds the `data` dictionary from resume JSON and calls `resume(data)` directly.
 
 Style priority: `--input style=X` > `data.style` > `"professional"`.
-The Export Service sets `data.style`; the CLI `--input` flag overrides it.
+The service sets `data.style`; the CLI `--input` flag overrides it for local dev.
 
 ## Styles
 
@@ -44,8 +46,9 @@ Or use the Justfile:
 ```bash
 just compile tests/default.typ # compile one file
 just watch tests/carpenter.typ # watch one file (defaults to tests/default.typ)
-just tests                     # compile all tests/*.typ
-just check                     # compile all + pdftotext -layout on each
+just all                       # compile all tests/*.typ
+just all-styles                # compile every test in all three styles
+just check                     # compile all + verify every font is embedded
 just clean                     # rm -rf pdf/
 ```
 
@@ -70,7 +73,7 @@ just clean                     # rm -rf pdf/
 **Localisation:**
 - Section headings are overridable per-resume via `data.headings` — pass any subset; unset keys fall back to English defaults
 - Sample data uses `MM.YYYY` date format
-- Language levels render as full CEFR text ("Elementary (A2)") rather than bare codes — A1/B1/C1 are also German driving licence categories, bare codes are ambiguous
+- Language `level` is rendered verbatim as `name — level`, so the caller controls the wording — CEFR codes (`C1`), full text (`Professional Working (C1)`), or `Native` all work. The `pdf-generator` service normalises LinkedIn proficiency strings to CEFR before sending
 
 **Diff view:**
 - `#diff-added[…]` and `#diff-deleted[…]` are defined as green-underline / red-strikethrough — no-ops unless a diff tool injects them, compatible with `typdiff` marker style
@@ -141,7 +144,7 @@ just clean                     # rm -rf pdf/
   ),
 
   languages: (
-    // level: full CEFR text preferred — "Native", "Professional Working (C1)", etc.
+    // level: rendered verbatim — CEFR code "C1", full text, or "Native"
     (name: "...", level: "..."),
   ),
 
@@ -151,22 +154,15 @@ just clean                     # rm -rf pdf/
 )
 ```
 
-## Planned
-
-- **Colour toggle:** add a `monochrome` variant; wrap accent colors in a helper `if monochrome { black } else { theme.accent }`. Useful for ATS submissions where colour can confuse older parsers.
-- **Affinda smoke test in CI:** Affinda has a free tier (50 req/month) with a REST API — piping `resume.pdf` through it produces structured JSON that can catch extraction regressions automatically.
-- **German headings:** a `--input lang=de` input could swap section titles; should map them in a dict `("Experience": "Berufserfahrung", …)` keyed by the lang input.
-- **Photo field:** render an optional `contact.photo` path as a right-floated image at the top of the contact block. Verify the text stream order is unaffected before shipping.
-
 ## ATS Extraction Check
+
+Inspect the extracted text layer to confirm parsers see clean, linear output — section headings in order, dates on the same line as company names, no scrambled text:
 
 ```bash
 pdftotext -layout pdf/default.pdf -
-# or run all at once:
-just check
 ```
 
-All styles produce clean linear output: section headings in order, dates on the same line as company names, no scrambled text.
+`just check` is the automated guard: it compiles every test file and fails if `pdffonts` reports any unembedded font, since a missing font breaks text extraction. The `pdf-generator` service ships the same recipe.
 
 ## Credits
 
